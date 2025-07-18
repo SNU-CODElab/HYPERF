@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 2 ]; then
-    echo "사용법: $0 <file_path> <file_name> <compiler_options>"
+    echo "사용법: $0 <file_path> <file_name> [compiler_options]"
     exit 1
 fi
 
