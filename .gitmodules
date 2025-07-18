@@ -4,3 +4,6 @@
 [submodule "hyperf_polybench"]
 	path = hyperf_polybench
 	url = https://github.com/SNU-CODElab/hyperf_polybench.git
+[submodule "hyperf_tvm"]
+	path = hyperf_tvm
+	url = https://github.com/SNU-CODElab/hyperf_tvm
