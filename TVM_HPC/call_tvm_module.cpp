@@ -49,9 +49,9 @@ int main() {
     // TVM 모듈 호출 코드
 std::cout << "A_data: " << std::endl;
 auto start = std::chrono::high_resolution_clock::now();
-tvm::runtime::Module mod = tvm::runtime::Module::LoadFromFile("/root/TVM_HPC/build/../test_input.cpp_tvm_prim_func.so");
+tvm::runtime::Module mod = tvm::runtime::Module::LoadFromFile("/root/HYPERF/TVM_HPC/build/../test_input.cpp_tvm_prim_func.so");
 if (!mod.defined()) {
-    std::cerr << "Error: Could not load module " << "/root/TVM_HPC/build/../test_input.cpp_tvm_prim_func.so" << std::endl;
+    std::cerr << "Error: Could not load module " << "/root/HYPERF/TVM_HPC/build/../test_input.cpp_tvm_prim_func.so" << std::endl;
     return -1;
 }
 

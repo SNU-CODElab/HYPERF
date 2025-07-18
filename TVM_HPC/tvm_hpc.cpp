@@ -36,7 +36,7 @@ static int FunctionCount = 0;
 // ----------------------------
 bool runInitialCompileAndExtractTIR(const std::string &inputCppPath, const std::string &compileopt) {
     // 기존 컴파일 명령어 + include path
-    std::string command = "clang -fPIC -fopenmp -shared -g -I/root/test/gemm/PolyBench-ACC/OpenMP/utilities -I /root/test/benchmarks/sw4lite/src/double/ -I /usr/lib/x86_64-linux-gnu/openmpi/include "
+    std::string command = "clang -fPIC -fopenmp -shared -g -I/root/HYPERF/polybench/OpenMP/utilities "
                           + compileopt+ " " + inputCppPath + " -o " + inputCppPath + "_preprocess_tvm.so";
     std::cout << "Running: " << command << std::endl;
     int ret = std::system(command.c_str());
@@ -56,7 +56,7 @@ bool runInitialCompileAndExtractTIR(const std::string &inputCppPath, const std::
 // 2. Python 스크립트를 이용한 TVM 빌드 단계
 // ----------------------------
 bool runTVMBuild(const std::string &libraryPath, const std::string &tirScriptPath, const std::string &outputSoPath, const std::string &ParamsPath) {
-    std::string command = "python /root/TVM_HPC/build_with_tvm.py --library_path " + libraryPath +
+    std::string command = "python /root/HYPERF/TVM_HPC/build_with_tvm.py --library_path " + libraryPath +
                           " --tir_script_path " + tirScriptPath + " --output_so_path " + outputSoPath + " --params_path " + ParamsPath;
     std::cout << "Running: " << command << std::endl;
     int ret = system(command.c_str());
@@ -889,12 +889,20 @@ int main(int argc, const char **argv) {
 
     clang::tooling::ClangTool Tool(OptionsParser->getCompilations(), OptionsParser->getSourcePathList());
 
+    //TBD - LLVM INCLUDE 환경변수 추가
+    const char* LLVM_INCLUDE = std::getenv("LLVM_INCLUDE");
+
+    if (LLVM_INCLUDE == nullptr) {
+        std::cerr << "\n";
+        return 1;
+    }
+
     // 추가 컴파일 옵션 설정
     
     std::vector<std::string> ExtraArgs = {
         "-fopenmp",
-        "-I/usr/lib/llvm-10/include/openmp",
-        "-I/root/test/gemm/polybench-c-3.2/utilities",
+        "-I{$}LLVM_INCLUDE}/openmp",
+        "-I/root/HYPERF/polybench/OpenMP/utilities",
         // 필요 시 더 추가
     };
 
