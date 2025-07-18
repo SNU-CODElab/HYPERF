@@ -1,0 +1,6 @@
+[submodule "hyperf_llvm_project"]
+	path = hyperf_llvm_project
+	url = https://github.com/SNU-CODElab/hyperf_llvm_project.git
+[submodule "hyperf_polybench"]
+	path = hyperf_polybench
+	url = https://github.com/SNU-CODElab/hyperf_polybench.git
