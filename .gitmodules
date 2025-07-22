@@ -1,9 +1,9 @@
 [submodule "hyperf_tvm"]
-	path = hyperf_tvm
+	path = tvm
 	url = https://github.com/SNU-CODElab/hyperf_tvm.git
 [submodule "hyperf_llvm_project"]
-	path = hyperf_llvm_project
+	path = llvm-project
 	url = https://github.com/SNU-CODElab/hyperf_llvm_project.git
 [submodule "hyperf_polybench"]
-	path = hyperf_polybench
+	path = polybench
 	url = https://github.com/SNU-CODElab/hyperf_polybench.git
