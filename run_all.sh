@@ -36,9 +36,9 @@ for FILE in "${FILES[@]}"; do
   echo "▶ 실행 중: $FILE"
   echo "=============================="
 
-  "$BUILD_SCRIPT" "${BENCH_ROOT}/${DIR}" "$BASE" "-DSMALL_DATASET" 
-  # "$BUILD_SCRIPT" "${BENCH_ROOT}/${DIR}" "$BASE" "-DSTANDARD_DATASET" 
-  # "$BUILD_SCRIPT" "${BENCH_ROOT}/${DIR}" "$BASE" "-DLARGE_DATASET" 
+  "$BUILD_SCRIPT" "${BENCH_ROOT}/${DIR}" "$BASE" "-DSMALL_DATASET"
+  # "$BUILD_SCRIPT" "${BENCH_ROOT}/${DIR}" "$BASE" "-DSTANDARD_DATASET"
+  # "$BUILD_SCRIPT" "${BENCH_ROOT}/${DIR}" "$BASE" "-DLARGE_DATASET"
   echo ""
 done
 

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
+# : "${MARCH:=sapphirerapids}"
+: "${MARCH:=native}"
+
+if [ "$#" -lt 2 ]; then
     echo "사용법: $0 <file_path> <file_name> [compiler_options]"
     exit 1
 fi
@@ -22,7 +25,7 @@ cd "$FILE_PATH" || exit 1
 # # 2. 원본 코드 빌드
 # -march=sapphirerapids
 echo "Compiling original ${FILE_NAME} ..."
-clang -O3 -march=sapphirerapids -fopenmp -DPOLYBENCH_TIME "$COMPILER_OPTIONS"\
+clang -O3 -march=$MARCH -fopenmp -DPOLYBENCH_TIME "$COMPILER_OPTIONS"\
   -I/root/HYPERF/polybench/OpenMP/utilities \
   "$FILE_NAME" \
   /root/HYPERF/polybench/OpenMP/utilities/polybench.c \
@@ -30,7 +33,7 @@ clang -O3 -march=sapphirerapids -fopenmp -DPOLYBENCH_TIME "$COMPILER_OPTIONS"\
 
 # 3. 변환된 코드 빌드
 echo "Compiling transformed ${REPLACED_FILE}..."
-clang -O3 -march=sapphirerapids -DPOLYBENCH_TIME "$COMPILER_OPTIONS"\
+clang -O3 -march=$MARCH -DPOLYBENCH_TIME "$COMPILER_OPTIONS"\
   -I/root/tvm/include \
   -I/root/tvm/3rdparty/dmlc-core/include \
   -I/root/tvm/3rdparty/dlpack/include \
@@ -40,7 +43,7 @@ clang -O3 -march=sapphirerapids -DPOLYBENCH_TIME "$COMPILER_OPTIONS"\
   -ltvm_runtime -ldl \
   -I/root/HYPERF/polybench/OpenMP/utilities \
   "$REPLACED_FILE" \
-  /root/test/gemm/PolyBench-ACC/OpenMP/utilities/polybench.c \
+  /root/HYPERF/polybench/OpenMP/utilities/polybench.c \
   -o hyperf_exec -lstdc++
 
 echo "Running performance tests..."
