@@ -150,8 +150,8 @@ cmake -G Ninja ../
 ninja
 ```
 
-Create a symbolic link to the TVM directory:
-```
+Create a symbolic link to the TVM_HPC directory:
+```bash
 cd $HOME
 ln -s $HYPERF_HOME/TVM_HPC TVM_HPC
 ```
