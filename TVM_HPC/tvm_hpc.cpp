@@ -1,7 +1,9 @@
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -29,7 +31,6 @@ using namespace clang;
 using namespace clang::tooling;
 using namespace clang::ast_matchers;
 
-static int FunctionCount = 0;
 // ----------------------------
 // 1. 초기 컴파일 & TIR 추출 단계
 // ----------------------------
@@ -388,7 +389,8 @@ public:
   virtual void run(const MatchFinder::MatchResult &Result) {
     if (const auto *OMPDir =
             Result.Nodes.getNodeAs<OMPAutotuneForDirective>("ompAutotuneFor")) {
-      SourceLocation Start = OMPDir->getBeginLoc();
+      SourceManager &SM = *Result.SourceManager;
+      SourceLocation Start = SM.getExpansionLoc(OMPDir->getBeginLoc());
 
       // CapturedStmt가 없을 가능성을 처리
       const CapturedStmt *CS = nullptr;
@@ -397,25 +399,52 @@ public:
       }
 
       SourceLocation End = (CS) ? CS->getEndLoc() : OMPDir->getEndLoc();
+      End = SM.getExpansionLoc(End);
 
       // 전체 Directive 범위를 교체
       SourceRange FullRange(Start, End);
-      std::string key = "main" + std::to_string(FunctionCount);
-      TheRewriter.ReplaceText(FullRange, ReplacementCodeMap[key]);
-      FunctionCount++;
-
-      std::cout << "Replaced Directive from "
-                << FullRange.getBegin().printToString(
-                       TheRewriter.getSourceMgr())
-                << " to "
-                << FullRange.getEnd().printToString(TheRewriter.getSourceMgr())
-                << "\n";
+      PendingReplacements.push_back({FullRange, Start});
     }
+  }
+
+  void ApplyPendingReplacements() {
+    if (PendingReplacements.empty()) {
+      return;
+    }
+
+    SourceManager &SM = TheRewriter.getSourceMgr();
+    std::sort(PendingReplacements.begin(), PendingReplacements.end(),
+              [&](const PendingReplacement &lhs,
+                  const PendingReplacement &rhs) {
+                return SM.isBeforeInTranslationUnit(lhs.OrderLoc,
+                                                    rhs.OrderLoc);
+              });
+
+    for (size_t index = 0; index < PendingReplacements.size(); ++index) {
+      const auto &entry = PendingReplacements[index];
+      std::string key = "main" + std::to_string(index);
+      auto replacementIt = ReplacementCodeMap.find(key);
+      if (replacementIt == ReplacementCodeMap.end()) {
+        llvm::errs() << "Missing replacement code for key: " << key << "\n";
+        continue;
+      }
+      TheRewriter.ReplaceText(entry.Range, replacementIt->second);
+      std::cout << "Replaced Directive " << key << " from "
+                << entry.Range.getBegin().printToString(SM) << " to "
+                << entry.Range.getEnd().printToString(SM) << "\n";
+    }
+
+    PendingReplacements.clear();
   }
 
 private:
   Rewriter &TheRewriter;
-  std::map<std::string, std::string> ReplacementCodeMap;
+  struct PendingReplacement {
+    SourceRange Range;
+    SourceLocation OrderLoc;
+  };
+  std::vector<PendingReplacement> PendingReplacements;
+  const std::map<std::string, std::string> &ReplacementCodeMap;
 };
 
 // ----------------------------
@@ -474,6 +503,7 @@ public:
 
   void HandleTranslationUnit(ASTContext &Context) override {
     Finder.matchAST(Context);
+    HandlerForTvm.ApplyPendingReplacements();
   }
 
 private:
