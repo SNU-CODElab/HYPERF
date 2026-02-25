@@ -237,7 +237,7 @@ def tune_ir_module(mod, target, work_dir, function_dict):
             mod=single_func_mod,
             target=target,
             work_dir="./",
-            max_trials_global=256,
+            max_trials_global=1000,
             num_trials_per_iter=64,
             task_inputs=task_inputs,
         )
