@@ -59,7 +59,7 @@ measure_exec() {
   echo "Running ${exec_name} 11 times..."
   for i in {1..11}; do
     echo "[$exec_name] Run #$i" >> "$log_file"
-    output=$(./"$exec_name" 2>&1)
+    output=$(OMP_NUM_THREADS=48 OMP_PROC_BIND=CLOSE ./"$exec_name" 2>&1)
     echo "$output" >> "$log_file"
 
     # 소수점으로 시작하는 숫자 줄 찾기 (예: 0.005526)
@@ -68,7 +68,7 @@ measure_exec() {
     if [[ -n "$time" ]]; then
       times+=("$time")
     fi
-    sleep 2
+    # sleep 2
   done
 
   if [ "${#times[@]}" -eq 0 ]; then
@@ -92,17 +92,17 @@ measure_exec() {
   echo "Median execution time for ${exec_name}: ${median} seconds"
   echo "Median execution time: ${median} seconds" >> "$log_file"
 }
-sleep 1
+# sleep 1
 measure_exec "openmp_exec"
-sleep 1
-measure_exec "hyperf_exec"
-sleep 1
-measure_exec "openmp_exec"
-sleep 1
+# sleep 1
 measure_exec "hyperf_exec"
 # sleep 1
 measure_exec "openmp_exec"
-sleep 1
+# sleep 1
+measure_exec "hyperf_exec"
+# sleep 1
+measure_exec "openmp_exec"
+# sleep 1
 measure_exec "hyperf_exec"
 
 echo "All done! Logs are saved in $LOG_DIR/"
