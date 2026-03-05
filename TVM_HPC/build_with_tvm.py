@@ -237,7 +237,7 @@ def tune_ir_module(mod, target, work_dir, function_dict):
             mod=single_func_mod,
             target=target,
             work_dir="./",
-            max_trials_global=256,
+            max_trials_global=1000,
             num_trials_per_iter=64,
             task_inputs=task_inputs,
         )
@@ -418,6 +418,17 @@ with tempfile.TemporaryDirectory() as work_dir:
             f.write(llvm_ir)
 
         print(f"Exported shared library to {output_so_path}")
+
+
+        with open("tuned_func.txt", "a") as f:
+            f.write("### Module: main\n")
+            f.write(final_ir_module.script())
+            for func_name, sch in tuned_schedules.items():
+                if sch is not None:
+                    f.write(f"\n### Trace for {func_name}:\n")
+                    f.write(str(sch.trace))
+            f.write("\n")
+
 
 
 # with tempfile.TemporaryDirectory() as work_dir:
