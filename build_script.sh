@@ -17,6 +17,12 @@ FILE_NAME_BASE=$(basename "$FILE_NAME" .c)
 FILE_NAME_HYPERF="${FILE_NAME_BASE}_hyperf.c"
 REPLACED_FILE="${FILE_NAME_HYPERF}_replaced.cpp"
 
+CLEAN_DIR="$FILE_PATH"
+echo "Cleaning previous logs and databases in ${CLEAN_DIR}..."
+rm -rf "${CLEAN_DIR}/logs" "${CLEAN_DIR}/${FILE_NAME_BASE}_hyperf_log" 
+rm "${CLEAN_DIR}/hyperf_exec"
+find "${CLEAN_DIR}" -maxdepth 1 -type f -name "*database*" -delete
+
 # 1. 변환 실행
 echo "Running tvm_hpc on ${FILE_NAME_HYPERF}..."
 cd "$FILE_PATH" || exit 1
@@ -92,17 +98,17 @@ measure_exec() {
   echo "Median execution time for ${exec_name}: ${median} seconds"
   echo "Median execution time: ${median} seconds" >> "$log_file"
 }
-# sleep 1
+sleep 1
 measure_exec "openmp_exec"
-# sleep 1
+sleep 1
+measure_exec "hyperf_exec"
+sleep 1
+measure_exec "openmp_exec"
+sleep 1
 measure_exec "hyperf_exec"
 # sleep 1
 measure_exec "openmp_exec"
-# sleep 1
-measure_exec "hyperf_exec"
-# sleep 1
-measure_exec "openmp_exec"
-# sleep 1
+sleep 1
 measure_exec "hyperf_exec"
 
 echo "All done! Logs are saved in $LOG_DIR/"
